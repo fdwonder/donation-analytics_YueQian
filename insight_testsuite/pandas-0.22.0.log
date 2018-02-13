@@ -1,7 +1,0 @@
-[[0;32mPASS[0m]: my-test_1 repeat_donors.txt
-[[0;31mFAIL[0m]: test_1
-2c2
-< C00384516|02895|2018|348|717|2
----
-> C00384516|02895|2018|333|717|2
-[Mon Feb 12 22:50:02 PST 2018] 1 of 2 tests passed
