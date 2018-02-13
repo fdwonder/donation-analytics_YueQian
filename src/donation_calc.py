@@ -52,7 +52,7 @@ def main():
     indiv_header=['CMTE_ID','AMNDT_IND','RPT_TP','TRANSACTION_PGI','IMAGE_NUM','TRANSACTION_TP','ENTITY_TP','NAME','CITY','STATE','ZIP_CODE','EMPLOYER','OCCUPATION','TRANSACTION_DT','TRANSACTION_AMT','OTHER_ID','TRAN_ID','FILE_NUM','MEMO_CD','MEMO_TEXT','SUB_ID']
     dataset_raw = pd.read_csv(data_file, delimiter='|', names=indiv_header, keep_default_na=False, dtype=str)
 
-#--- Data Cleaning Start---
+#--- Data Cleaning Starts---
     # keep columns of interest
     dataset_valid = pd.DataFrame()
     dataset_valid = dataset_raw.drop(['AMNDT_IND', 'RPT_TP', 'TRANSACTION_PGI', \
@@ -71,16 +71,36 @@ def main():
     # 'TRANSACTION_AMT' is valid only when > 0
     dataset_valid = dataset_valid[dataset_valid['TRANSACTION_AMT'] > 0]
 
-    # first : Mark duplicates as True except for the first occurrence
-    dataset_repeat = dataset_valid[dataset_valid.duplicated \
-        (['NAME', 'ZIP_CODE'], keep='first')]
+    # Keep all duplicates
+    dataset_valid = dataset_valid[dataset_valid.duplicated \
+        (['NAME', 'ZIP_CODE'], keep=False)]
 
-    # create new dataframe with combined "Identiey" and transaction amount
+    # create new dataframe with combined "Identiey" to identify out-out-order records
+    # identity=NAME++ZIP_CODE
+    dataset_repeat = pd.DataFrame()
+    dataset_repeat['Identity'] = dataset_valid['NAME'] + dataset_valid.ZIP_CODE.str[0:5]
+    dataset_repeat['CMTE_ID'] = dataset_valid['CMTE_ID']
+    dataset_repeat['TRANS_AMT'] = dataset_valid['TRANSACTION_AMT']
+    dataset_repeat['date'] = pd.to_datetime(dataset_valid['TRANSACTION_DT'], format='%m%d%Y', errors='ignore')
+
+    # group by 'Identity'
+    grouped = dataset_repeat.groupby('Identity')
+
+    # Shift the previous data from the same group and take the difference
+    dataset_repeat['date_shifted'] = dataset_repeat.groupby(['Identity'])['date'].shift(1)
+    dataset_repeat['date_diff'] = dataset_repeat['date_shifted'] - dataset_repeat['date']
+    dataset_repeat['date_diff'] = pd.to_timedelta(dataset_repeat['date_diff']).astype(str).str[0:2]
+    # drop the first occurence
+    dataset_repeat = dataset_repeat.dropna(how='any')
+    # drop the out of order (positives 'date_diff') records
+    dataset_repeat = dataset_repeat[dataset_repeat['date_diff'].astype(int) <= 0]
+
+    # create new dataframe with combined "Identity" and transaction amount
     dataset_arrange = pd.DataFrame()
-    dataset_arrange['Identity'] = dataset_repeat['CMTE_ID'] + dataset_repeat.ZIP_CODE.str[
-                                                              0:5] + dataset_repeat.TRANSACTION_DT.str[-4:]
-    dataset_arrange['TRANS_AMT'] = dataset_repeat.TRANSACTION_AMT
-    dataset_arrange['index1'] = dataset_arrange.index
+    dataset_arrange['Identity'] = dataset_repeat['CMTE_ID'] + dataset_repeat['Identity'].str[-5:] + dataset_repeat['date'].dt.year.astype(str)
+    dataset_arrange['TRANS_AMT'] = dataset_repeat['TRANS_AMT']
+
+# --- Data Cleaning Ends---
 
     # readin percentile.txt
     percentile_line = open(perc_file,"r").read() 
