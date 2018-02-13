@@ -24,7 +24,7 @@ def main():
         prog='donation_calc.py',
         description="""
     @author: Yue Qian, yue.qian@yale.edu
-    usage: python3.6 test.py -i ./input/itcont.txt -p ./input/percentile.txt -o ./output/repeat_donors.txt
+    usage: python3.6 donation_calc.py -i ./input/itcont.txt -p ./input/percentile.txt -o ./output/repeat_donors.txt
     """
     )
 
