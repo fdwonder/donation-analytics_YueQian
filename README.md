@@ -21,6 +21,7 @@ I found the coding challenge very inspiring and rewarding. Not only did I learn 
 # Notes
 
 * Pandas{0.22.0} bug: panda is not using interpolation when expanding/rolling of windows is called. All of the interpolation options ended up getting 'linear' percentile of contribution. Bug reported. As indicated by the code below, calculating the running percentile of contribution can be achieved from sratch.
+
 * The "intuitive method":
 
     dd = defaultdict(list)
