@@ -1,7 +1,7 @@
 
 # Introduction
 
-This is a python script witten for running percentile of contribution calculation for donations coming from the same area to the same recepient. Sample tests were included.
+This is a python script written for running percentile of contribution calculation for donations coming from the same area to the same recipient. Sample tests were included.
 
 Usage: ./run.sh or python3.6 donation_calc.py -i ./input/itcont.txt -p ./input/percentile.txt -o ./output/repeat_donors.txt
 
@@ -12,17 +12,17 @@ This project involves substantial data cleaning in advance to data processing. U
 
 * Taking out the records that are out of the chronologic order
 
-Being part of the aforementioned steps, this is a very interesting task given its resemblance of daily senario. Instead of trying to re-order the whole list, output data on-the-fly might be necessary in our daily life. `Pandas.groupby` method is chosen using `name` and `zip code` as a combination of key. The donation date in each column is then shifted to the next, obtaining the time span at the same time. The time span is used to determine if the record in each `name` & `zip code` group is of first occurence or out of chronological order, both of which will be deleted.
+Being part of the aforementioned steps, this is a very interesting task given its resemblance of daily scenario. Instead of trying to re-order the whole list, output data on-the-fly might be necessary in our daily life. `Pandas.groupby` method is chosen using `name` and `zip code` as a combination of key. The donation date in each column is then shifted to the next, obtaining the time span at the same time. The time span is used to determine if the record in each `name` & `zip code` group is of first occurrence or out of chronological order, both of which will be deleted.
 
 ## 2. Rolling data calculation
-This is certianly a very intriguing yet challenging question. The most intuivite thought would be looping through the `keys` as the corresponding list increases in size (code attached). Several attempts have been made to tackel the problem without looping through the whole pandas dataframe. Pandas incoorperates `expanding` option for grouped data with a specified window, which enables the running percentile of contribution calculation. This also applies to the total amount and total times of contribution calculations. Test results shows that the calculation expensen is at around O(1.3). However, the "intuitive method" also gives me O(1.3). There could be bether ways to do it.
+This is certainly a very intriguing yet challenging question. The most intuitive thought would be looping through the `keys` as the corresponding list increases in size (code attached). Several attempts have been made to tackle the problem without looping through the whole pandas dataframe. Pandas incorporates `expanding` option for grouped data with a specified window, which enables the running percentile of contribution calculation. This also applies to the total amount and total times of contribution calculations. Test results shows that the calculation expense is at around O(1.3). However, the "intuitive method" also gives me O(1.3). There could be better ways to do it.
 
 # Summary
 I found the coding challenge very inspiring and rewarding. Not only did I learn from the project, but also developed lots of other data science related ideas. I do hope the experience would help me come to more insightful thoughts and solid skills. 
 
 # Notes
 
-* Pandas{0.22.0} bug: panda is not using interpolation when expanding/rolling of windows is called. All of the interpolation options ended up getting 'linear' percentile of contribution. Bug reported. As indicated by the code below, calculating the running percentile of contribution can be achieved from sratch.
+* Pandas{0.22.0} bug: panda is not using interpolation when expanding/rolling of windows is called. All of the interpolation options ended up getting 'linear' percentile of contribution. Bug reported. As indicated by the code below, calculating the running percentile of contribution can be achieved from scratch.
 
 * The "intuitive method":
 >
